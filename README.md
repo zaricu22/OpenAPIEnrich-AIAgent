@@ -63,3 +63,13 @@ At the top of `enrich_openapi.py`:
 | `MAX_FILE_CHARS` | `3000` | Max characters read from each source file for context |
 | `MAX_TOKENS` | `4096` | Max tokens per Claude response |
 | `MAX_RETRIES` | `3` | Retry attempts on JSON parse failure |
+
+## AI/LLM concepts implemented
+
+- **Generative AI / natural language generation (NLG)** — Claude generates missing `description`, `summary`, `example` text for OpenAPI schemas/operations (`enrich_with_ai()`).
+- **Prompt engineering** — a strict, constrained instruction set defining what the model may and may not touch (`build_prompt()`).
+- **LLM agents / agentic workflow** — a gather-context → prompt → generate → validate → persist loop (`main()`).
+- **Retrieval-augmented generation (heuristic/lexical RAG)** — relevant Java source files are retrieved by keyword/tag matching to ground the model's output in the actual codebase (`collect_schema_context()`, `collect_operation_context()`).
+- **AI output validation / guardrails** — checks that Claude didn't silently drop fields, plus JSON-fence stripping and retry-with-backoff on malformed generations (`_validate_enrichment()`, `enrich_with_ai()`).
+- **Human-in-the-loop / AI-assisted authoring** — enrichment only fills fields left blank by the developer; existing text always wins (`schema_needs_enrichment()`, `operation_needs_enrichment()`).
+- **Caching / cost-optimization for LLM calls** — content hashing (`x-raw-hash`) skips unchanged schemas/operations to avoid redundant API calls (`compute_hash()`, `main()`).
