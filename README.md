@@ -66,10 +66,11 @@ At the top of `enrich_openapi.py`:
 
 ## AI/LLM concepts implemented
 
+- **AI-augmented pipeline** — main() runs a fixed hash-check → context → prompt → generate → validate → persist loop per section; the LLM only handles generation, not control flow.
 - **Generative AI / natural language generation (NLG)** — Claude generates missing `description`, `summary`, `example` text for OpenAPI schemas/operations (`enrich_with_ai()`).
 - **Prompt engineering** — a strict, constrained instruction set defining what the model may and may not touch (`build_prompt()`).
-- **LLM agents / agentic workflow** — a gather-context → prompt → generate → validate → persist loop (`main()`).
 - **Retrieval-augmented generation (heuristic/lexical RAG)** — relevant Java source files are retrieved by keyword/tag matching to ground the model's output in the actual codebase (`collect_schema_context()`, `collect_operation_context()`).
+- **Context-augmented generation (CAG)** — `collect_schema_context()` / `collect_operation_context()` retrieve relevant Java files, which `build_prompt()` then injects as structured `repository_context` into the prompt.
 - **AI output validation / guardrails** — checks that Claude didn't silently drop fields, plus JSON-fence stripping and retry-with-backoff on malformed generations (`_validate_enrichment()`, `enrich_with_ai()`).
 - **Human-in-the-loop / AI-assisted authoring** — enrichment only fills fields left blank by the developer; existing text always wins (`schema_needs_enrichment()`, `operation_needs_enrichment()`).
 - **Caching / cost-optimization for LLM calls** — content hashing (`x-raw-hash`) skips unchanged schemas/operations to avoid redundant API calls (`compute_hash()`, `main()`).
